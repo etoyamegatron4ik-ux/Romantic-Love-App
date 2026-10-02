@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffe3f0" />
+<title>Ты меня любишь? ❤️</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   1. ДИЗАЙН-ТОКЕНЫ
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --pink:        #ff4f8b;
+  --pink-soft:   #ff9ec7;
+  --lavender:    #c084fc;
+  --violet:      #7b6cf6;
+  --ink:         #4a2c45;
+  --ink-soft:    #8a6a86;
+
+  --glass:       rgba(255,255,255,.55);
+  --glass-str:   rgba(255,255,255,.75);
+  --glass-brd:   rgba(255,255,255,.85);
+
+  --shadow-lg:   0 30px 72px -24px rgba(186,104,160,.50),
+                 0 10px 28px -14px rgba(150,100,200,.32),
+                 inset 0 1px 0 rgba(255,255,255,.95);
+
+  --radius-xl:   38px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. RESET / БАЗА
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  min-height:100dvh;
+  font-family:'Quicksand', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color:var(--ink);
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+
+  background:
+    radial-gradient(circle at 12% 16%, #ffe3f0 0%, transparent 55%),
+    radial-gradient(circle at 88% 10%, #e9dcff 0%, transparent 52%),
+    radial-gradient(circle at 76% 90%, #ffe0ec 0%, transparent 55%),
+    radial-gradient(circle at 16% 94%, #e2f0ff 0%, transparent 52%),
+    linear-gradient(160deg, #fff7fc 0%, #fdeaf6 42%, #ece4ff 100%);
+  background-attachment:fixed;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. СЛОИ
+   ═══════════════════════════════════════════════════════════════ */
+.bg-layer{
+  position:fixed; inset:0; z-index:1;
+  overflow:hidden; pointer-events:none;
+}
+#fx{
+  position:fixed; inset:0; z-index:5; pointer-events:none;
+}
+.stage{
+  position:relative; z-index:2;
+  min-height:100vh; min-height:100dvh;
+  display:grid; place-items:center;
+  padding:26px 18px calc(26px + env(safe-area-inset-bottom));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   4. ЛЕТАЮЩИЕ СЕРДЕЧКИ НА ФОНЕ
+   ═══════════════════════════════════════════════════════════════ */
+.bg-heart{
+  position:absolute; bottom:-80px;
+  will-change:transform,opacity;
+  animation-name:floatUp;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+  opacity:0;
+  user-select:none;
+  filter:drop-shadow(0 4px 12px rgba(200,120,170,.28));
+}
+@keyframes floatUp{
+  0%   { transform:translate3d(0,0,0) rotate(0deg) scale(.72); opacity:0; }
+  12%  { opacity:var(--op,.5); }
+  85%  { opacity:var(--op,.5); }
+  100% { transform:translate3d(22px,-114vh,0) rotate(340deg) scale(1.15); opacity:0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   5. СТЕКЛЯННАЯ КАРТОЧКА
+   ═══════════════════════════════════════════════════════════════ */
+.card{
+  position:relative;
+  width:min(560px, 100%);
+  padding:48px 34px 42px;
+  border-radius:var(--radius-xl);
+  text-align:center;
+
+  background:linear-gradient(150deg, rgba(255,255,255,.68), rgba(255,255,255,.32));
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  border:1px solid var(--glass-brd);
+  box-shadow:var(--shadow-lg);
+
+  animation:cardIn .9s cubic-bezier(.2,.85,.25,1) both;
+}
+@keyframes cardIn{
+  from{ opacity:0; transform:translateY(30px) scale(.93); filter:blur(8px); }
+  to  { opacity:1; transform:none; filter:blur(0); }
+}
+.card.fade-out{
+  animation:cardOut .5s cubic-bezier(.4,0,.7,.2) forwards;
+  pointer-events:none;
+}
+@keyframes cardOut{
+  to{ opacity:0; transform:translateY(-26px) scale(.93); filter:blur(10px); }
+}
+
+.card::before{
+  content:"";
+  position:absolute; top:-46px; left:50%;
+  width:300px; height:190px;
+  transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(255,140,190,.48), transparent 70%);
+  filter:blur(16px);
+  pointer-events:none; z-index:-1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. ЭКРАН С ВОПРОСОМ
+   ═══════════════════════════════════════════════════════════════ */
+.kicker{
+  display:inline-block;
+  font-size:13px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:#c0568f;
+  background:rgba(255,255,255,.62);
+  border:1px solid rgba(255,255,255,.9);
+  padding:7px 17px; border-radius:999px;
+  margin-bottom:22px;
+  box-shadow:0 6px 18px -10px rgba(190,90,150,.65);
+}
+
+.question{
+  font-family:'Comfortaa','Quicksand',sans-serif;
+  font-weight:700;
+  font-size:clamp(28px, 7.2vw, 44px);
+  line-height:1.16;
+  margin:0 0 14px;
+  letter-spacing:-.5px;
+
+  background:linear-gradient(115deg, #ff4f8b 0%, #c86dd7 48%, #7b6cf6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+  margin:0;
+  font-size:clamp(14px,3.6vw,16.5px);
+  font-weight:600;
+  color:var(--ink-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7. КНОПКИ
+   ═══════════════════════════════════════════════════════════════ */
+.btn-row{
+  display:flex;
+  justify-content:center; align-items:center;
+  gap:16px; flex-wrap:wrap;
+  margin-top:38px;
+}
+
+.btn{
+  font-family:'Quicksand',sans-serif;
+  font-size:19px; font-weight:700;
+  letter-spacing:.2px;
+  padding:17px 46px;
+  border:none; border-radius:999px;
+  cursor:pointer;
+  user-select:none; -webkit-user-select:none;
+  touch-action:manipulation;
+  white-space:nowrap;
+  transition:transform .25s cubic-bezier(.2,.8,.25,1),
+             box-shadow .25s ease,
+             background .25s ease,
+             opacity .3s ease;
+}
+
+/* ── ДА ── */
+.btn-yes{
+  color:#fff;
+  background:linear-gradient(135deg, #ff8fbd 0%, #ff4f8b 46%, #c86dd7 100%);
+  box-shadow:0 15px 32px -10px rgba(255,79,139,.85);
+  animation:pulse 2.2s ease-in-out infinite;
+  position:relative; overflow:hidden;
+}
+.btn-yes::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(120deg, transparent 25%, rgba(255,255,255,.6) 50%, transparent 75%);
+  transform:translateX(-120%);
+  animation:shine 3.4s ease-in-out infinite;
+}
+@keyframes shine{
+  0%,62%{ transform:translateX(-120%); }
+  90%,100%{ transform:translateX(120%); }
+}
+@keyframes pulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 15px 32px -10px rgba(255,79,139,.85), 0 0 0 0 rgba(255,79,139,.45);
+  }
+  50%{
+    transform:scale(1.05);
+    box-shadow:0 20px 40px -10px rgba(255,79,139,.95), 0 0 0 18px rgba(255,79,139,0);
+  }
+}
+.btn-yes:hover,
+.btn-yes:focus-visible{
+  animation:none;
+  transform:scale(1.1) translateY(-2px);
+  box-shadow:0 22px 46px -12px rgba(255,79,139,1);
+  outline:none;
+}
+.btn-yes:active{ transform:scale(1.02); }
+
+/* ── НЕТ ── */
+.btn-no{
+  color:#6b5b78;
+  background:var(--glass-str);
+  border:1.5px solid rgba(255,255,255,.95);
+  box-shadow:0 10px 24px -12px rgba(120,90,140,.65);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.btn-no:hover{ transform:translateY(-2px) scale(1.04); }
+
+.btn-no.flying{
+  position:fixed; margin:0; z-index:9999;
+  will-change:left,top;
+  transition:left .21s cubic-bezier(.2,.9,.3,1.35),
+             top  .21s cubic-bezier(.2,.9,.3,1.35),
+             opacity .35s ease,
+             transform .35s ease;
+  box-shadow:0 18px 38px -12px rgba(120,90,140,.75);
+}
+.btn-no.gone{
+  opacity:0; transform:scale(.5); pointer-events:none;
+}
+
+/* ── Скачать ── */
+.btn-download{
+  color:#fff;
+  background:linear-gradient(135deg, #b6a3ff 0%, #8e7bff 46%, #ff6fae 100%);
+  box-shadow:0 15px 34px -10px rgba(150,100,220,.75),
+             0 0 0 0 rgba(255,110,175,.4);
+  position:relative;
+  overflow:hidden;
+  margin-top:26px;
+  padding:15px 42px;
+  font-size:17px;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.btn-download::before{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  transform:translateX(-120%);
+  animation:shine 4s ease-in-out infinite;
+}
+.btn-download:hover,
+.btn-download:focus-visible{
+  transform:translateY(-3px) scale(1.045);
+  box-shadow:0 22px 44px -12px rgba(150,100,220,.95);
+  outline:none;
+}
+.btn-download:active{ transform:scale(1.01); }
+.btn-download[disabled]{
+  opacity:.6; cursor:wait; transform:none;
+}
+
+.btn-download .dl-icon{
+  font-size:20px;
+  animation:bob 2.4s ease-in-out infinite;
+}
+@keyframes bob{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-3px); }
+}
+
+/* Дразнилка */
+.taunt{
+  position:fixed; z-index:9998;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  font-family:'Quicksand',sans-serif;
+  font-weight:700; font-size:14.5px;
+  white-space:nowrap;
+  color:#b5407a;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(255,180,215,.9);
+  padding:6px 16px; border-radius:999px;
+  box-shadow:0 10px 24px -10px rgba(180,80,140,.75);
+  animation:tauntPop 1.15s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes tauntPop{
+  0%  { opacity:0; transform:translate(-50%,-20%) scale(.55); }
+  22% { opacity:1; transform:translate(-50%,-62%) scale(1.1); }
+  55% { opacity:1; transform:translate(-50%,-98%) scale(1); }
+  100%{ opacity:0; transform:translate(-50%,-175%) scale(.9); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   8. ЭКРАН УСПЕХА
+   ═══════════════════════════════════════════════════════════════ */
+.success-card{ padding:46px 30px 42px; }
+
+.success-emoji{
+  font-size:clamp(46px, 12vw, 64px);
+  line-height:1;
+  animation:popIn .9s cubic-bezier(.2,.85,.25,1.6) both;
+}
+@keyframes popIn{
+  0%  { opacity:0; transform:scale(.25) rotate(-20deg); }
+  60% { opacity:1; transform:scale(1.2) rotate(7deg); }
+  100%{ transform:scale(1) rotate(0); }
+}
+
+.success-title{
+  font-family:'Comfortaa','Quicksand',sans-serif;
+  font-weight:700;
+  font-size:clamp(25px, 6.6vw, 36px);
+  line-height:1.18;
+  margin:12px 0 8px;
+
+  background:linear-gradient(115deg, #ff4f8b, #c86dd7 55%, #7b6cf6);
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+}
+
+.success-sub{
+  margin:0 auto 22px;
+  max-width:400px;
+  font-size:clamp(14px, 3.7vw, 16.5px);
+  font-weight:600;
+  color:var(--ink-soft);
+}
+
+/* ── Рамка для фото ── */
+.photo-frame{
+  position:relative;
+  width:min(360px, 82vw);
+  margin:0 auto;
+  padding:14px;
+  border-radius:32px;
+
+  background:linear-gradient(150deg, rgba(255,255,255,.72), rgba(255,255,255,.38));
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid var(--glass-brd);
+  box-shadow:
+    0 26px 60px -22px rgba(186,104,160,.6),
+    0 8px 24px -12px rgba(150,100,200,.35),
+    inset 0 1px 0 rgba(255,255,255,.95);
+
+  animation:frameIn .9s cubic-bezier(.2,.85,.25,1.1) both;
+  animation-delay:.25s;
+}
+@keyframes frameIn{
+  from{ opacity:0; transform:translateY(26px) scale(.9) rotate(-2deg); }
+  to  { opacity:1; transform:translateY(0) scale(1) rotate(-1.2deg); }
+}
+
+.photo-frame::before,
+.photo-frame::after{
+  content:"";
+  position:absolute;
+  width:64px; height:20px;
+  background:linear-gradient(135deg, rgba(255,180,215,.7), rgba(200,150,240,.6));
+  border-radius:3px;
+  box-shadow:0 4px 10px -4px rgba(160,90,150,.55);
+  pointer-events:none;
+  z-index:3;
+}
+.photo-frame::before{
+  top:-9px; left:-12px;
+  transform:rotate(-14deg);
+}
+.photo-frame::after{
+  bottom:-9px; right:-12px;
+  transform:rotate(-14deg);
+}
+
+.photo-inner{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:22px;
+  overflow:hidden;
+  background:linear-gradient(160deg, #fff5fa, #ffe4f2);
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,.9),
+             inset 0 0 40px rgba(255,180,215,.35);
+}
+.photo-inner img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  animation:photoIn .8s ease both;
+}
+@keyframes photoIn{
+  from{ opacity:0; transform:scale(1.08); filter:blur(8px); }
+  to  { opacity:1; transform:none; filter:blur(0); }
+}
+
+.photo-frame .heart-badge{
+  position:absolute;
+  top:-14px; right:-14px;
+  z-index:4;
+  width:52px; height:52px;
+  display:grid; place-items:center;
+  font-size:26px;
+  background:linear-gradient(135deg,#ff8fbd,#ff4f8b);
+  border-radius:50%;
+  box-shadow:0 12px 24px -8px rgba(255,79,139,.85),
+             inset 0 2px 6px rgba(255,255,255,.6);
+  animation:heartBeat 1.8s ease-in-out infinite;
+}
+@keyframes heartBeat{
+  0%,100%{ transform:scale(1); }
+  20%    { transform:scale(1.14); }
+  40%    { transform:scale(.98); }
+  60%    { transform:scale(1.08); }
+}
+
+.photo-caption{
+  margin:18px 0 0;
+  font-family:'Comfortaa','Quicksand',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  color:#b04b86;
+  letter-spacing:.02em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   9. УВЕДОМЛЕНИЕ
+   ═══════════════════════════════════════════════════════════════ */
+.toast{
+  position:fixed;
+  left:50%; bottom:26px;
+  transform:translate(-50%, 140%);
+  z-index:10000;
+  display:flex; align-items:center; gap:10px;
+  font-family:'Quicksand',sans-serif;
+  font-size:14.5px; font-weight:700;
+  color:#7a3566;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,190,225,.95);
+  padding:12px 22px;
+  border-radius:999px;
+  box-shadow:0 20px 44px -18px rgba(180,90,145,.85);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  pointer-events:none;
+  opacity:0;
+  transition:transform .55s cubic-bezier(.2,.85,.25,1.2), opacity .45s ease;
+  max-width:calc(100vw - 32px);
+}
+.toast.show{
+  transform:translate(-50%, 0);
+  opacity:1;
+}
+.toast .t-emoji{ font-size:18px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   10. АДАПТИВ
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width:420px){
+  .card{ padding:40px 22px 36px; border-radius:30px; }
+  .btn{ font-size:17.5px; padding:15px 34px; }
+  .btn-row{ gap:12px; margin-top:30px; }
+  .success-card{ padding:40px 20px 36px; }
+  .btn-download{ font-size:16px; padding:14px 34px; }
+}
+
+@media (max-height:660px){
+  .stage{ align-items:start; padding-top:18px; }
+  .card{ padding:34px 24px 30px; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<main class="stage">
+
+  <!-- ══════════ КАРТОЧКА С ВОПРОСОМ ══════════ -->
+  <section class="card" id="questionCard" aria-labelledby="questionTitle">
+    <span class="kicker">Важный вопрос</span>
+    <h1 class="question" id="questionTitle">Ты меня любишь? ❤️</h1>
+    <p class="subtitle">Отвечай честно… я волнуюсь 🥺</p>
+
+    <div class="btn-row">
+      <button class="btn btn-yes" id="yesBtn" type="button">Да 💖</button>
+      <div class="no-slot" id="noSlot">
+        <button class="btn btn-no" id="noBtn" type="button" aria-label="Нет">Нет</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ КАРТОЧКА УСПЕХА ══════════ -->
+  <section class="card success-card" id="successCard" hidden aria-labelledby="successTitle">
+    <div class="success-emoji">🥰</div>
+    <h2 class="success-title" id="successTitle">Ура! ❤️ Я знал!</h2>
+    <p class="success-sub">Ты - моя халосая)</p>
+
+    <div class="photo-frame">
+      <span class="heart-badge">💖</span>
+      <div class="photo-inner">
+        <img id="lovePhoto" alt="Наше фото" />
+      </div>
+    </div>
+
+    <p class="photo-caption">Моё маленькое чудо 💕</p>
+
+    <button class="btn btn-download" id="downloadBtn" type="button">
+      <span class="dl-icon">💾</span>
+      <span>Скачать фото</span>
+    </button>
+  </section>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="t-emoji">💖</span>
+  <span class="t-text">Фото сохранено!</span>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════
+   💝  НАСТРОЙКА ФОТО  💝
+   ══════════════════════════════════════════════════════════════════════ */
+const LOVE_IMAGE = {
+  base64:   "",                 // ← Base64 (начинается с "data:image/...")
+  path:     "photo.jpg",        // ← или имя файла рядом с HTML
+  filename: "my_love.jpg"       // ← как сохранится при скачивании
+};
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ССЫЛКИ
+   ══════════════════════════════════════════════════════════════════════ */
+const questionCard = document.getElementById('questionCard');
+const successCard  = document.getElementById('successCard');
+const yesBtn       = document.getElementById('yesBtn');
+const noBtn        = document.getElementById('noBtn');
+const noSlot       = document.getElementById('noSlot');
+const bgLayer      = document.getElementById('bgLayer');
+const canvas       = document.getElementById('fx');
+const ctx          = canvas.getContext('2d');
+const toast        = document.getElementById('toast');
+const lovePhoto    = document.getElementById('lovePhoto');
+const downloadBtn  = document.getElementById('downloadBtn');
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   СОСТОЯНИЕ
+   ══════════════════════════════════════════════════════════════════════ */
+let accepted      = false;
+let noFlying      = false;
+let noCooldown    = 0;
+let lastPointer   = { x: -9999, y: -9999 };
+let proxScheduled = false;
+let currentPhoto  = null;    // { src, filename } — что скачивать
+
+const NO_TAUNTS = [
+  'Упс! 😅', 'Не туда! 🏃', 'Подумай ещё 🥺', 'Поймай меня! 💨',
+  'Мимо! ✨', 'Я тут! 🙈', 'Не сегодня 😜', 'А может «Да»? 🥰',
+  'Ты серьёзно? 😳', 'Я быстрее! ⚡', 'Ну почти! 😝', 'Хи-хи 🙊'
+];
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   1. ФОНОВЫЕ СЕРДЕЧКИ
+   ══════════════════════════════════════════════════════════════════════ */
+(function buildBackgroundHearts() {
+  const EMOJI = ['❤️','💖','💕','💗','💞','🌸','✨','💝'];
+  const frag  = document.createDocumentFragment();
+
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.className = 'bg-heart';
+    s.textContent = EMOJI[(Math.random() * EMOJI.length) | 0];
+    s.style.left              = (Math.random() * 100).toFixed(2) + '%';
+    s.style.fontSize          = (12 + Math.random() * 24).toFixed(1) + 'px';
+    s.style.animationDuration = (15 + Math.random() * 18).toFixed(1) + 's';
+    s.style.animationDelay    = (-Math.random() * 32).toFixed(1) + 's';
+    s.style.setProperty('--op', (0.22 + Math.random() * 0.45).toFixed(2));
+    frag.appendChild(s);
+  }
+  bgLayer.appendChild(frag);
+})();
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   2. НЕУЛОВИМАЯ КНОПКА «НЕТ»
+   ══════════════════════════════════════════════════════════════════════ */
+function showTaunt(x, y, text) {
+  const el = document.createElement('div');
+  el.className = 'taunt';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function teleportNo(px, py) {
+  if (accepted) return;
+
+  const now = performance.now();
+  if (now < noCooldown) return;
+  noCooldown = now + 200;
+
+  if (!noFlying) {
+    const r = noBtn.getBoundingClientRect();
+
+    noSlot.style.width  = r.width  + 'px';
+    noSlot.style.height = r.height + 'px';
+
+    document.body.appendChild(noBtn);
+    noBtn.classList.add('flying');
+    noBtn.style.width  = r.width  + 'px';
+    noBtn.style.height = r.height + 'px';
+    noBtn.style.left   = r.left   + 'px';
+    noBtn.style.top    = r.top    + 'px';
+
+    void noBtn.offsetWidth;
+    noFlying = true;
+
+    setTimeout(() => { noSlot.style.display = 'none'; }, 60);
+  }
+
+  const PAD = 14;
+  const bw  = noBtn.offsetWidth  || 120;
+  const bh  = noBtn.offsetHeight || 56;
+  const maxX = Math.max(PAD, window.innerWidth  - bw - PAD);
+  const maxY = Math.max(PAD, window.innerHeight - bh - PAD);
+
+  const cx = (px == null) ? window.innerWidth  / 2 : px;
+  const cy = (py == null) ? window.innerHeight / 2 : py;
+
+  const minDist = Math.min(window.innerWidth, window.innerHeight) * 0.40;
+  let bestX = PAD, bestY = PAD, bestD = -1;
+
+  for (let i = 0; i < 30; i++) {
+    const tx = PAD + Math.random() * (maxX - PAD);
+    const ty = PAD + Math.random() * (maxY - PAD);
+    const d  = Math.hypot(tx + bw / 2 - cx, ty + bh / 2 - cy);
+    if (d > bestD) { bestD = d; bestX = tx; bestY = ty; }
+    if (d > minDist) break;
+  }
+
+  noBtn.style.left = bestX + 'px';
+  noBtn.style.top  = bestY + 'px';
+
+  if (window.innerWidth > 380) {
+    const msg = NO_TAUNTS[(Math.random() * NO_TAUNTS.length) | 0];
+    showTaunt(bestX + bw / 2, bestY - 6, msg);
+  }
+}
+
+noBtn.addEventListener('pointerenter', (e) => teleportNo(e.clientX, e.clientY));
+noBtn.addEventListener('pointerdown',  (e) => { e.preventDefault(); teleportNo(e.clientX, e.clientY); });
+noBtn.addEventListener('click',        (e) => { e.preventDefault(); teleportNo(e.clientX, e.clientY); });
+noBtn.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const t = e.touches[0];
+  teleportNo(t ? t.clientX : null, t ? t.clientY : null);
+}, { passive: false });
+
+document.addEventListener('pointermove', (e) => {
+  lastPointer.x = e.clientX;
+  lastPointer.y = e.clientY;
+  if (accepted || proxScheduled) return;
+
+  proxScheduled = true;
+  requestAnimationFrame(() => {
+    proxScheduled = false;
+    if (accepted) return;
+
+    const r  = noBtn.getBoundingClientRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    const reach = Math.max(r.width, r.height) / 2 + 54;
+
+    if (Math.hypot(lastPointer.x - cx, lastPointer.y - cy) < reach) {
+      teleportNo(lastPointer.x, lastPointer.y);
+    }
+  });
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  if (!noFlying || accepted) return;
+  const PAD = 14;
+  const bw = noBtn.offsetWidth, bh = noBtn.offsetHeight;
+  const x = Math.min(parseFloat(noBtn.style.left) || 0, window.innerWidth  - bw - PAD);
+  const y = Math.min(parseFloat(noBtn.style.top)  || 0, window.innerHeight - bh - PAD);
+  noBtn.style.left = Math.max(PAD, x) + 'px';
+  noBtn.style.top  = Math.max(PAD, y) + 'px';
+});
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   3. ДВИЖОК ЧАСТИЦ
+   ══════════════════════════════════════════════════════════════════════ */
+const CONFETTI_COLORS = [
+  '#ff6fa5','#ff9ec7','#ffd1e3','#c9a7ff','#a78bfa',
+  '#ffd166','#ffe9a8','#7ee8fa','#ff4f8b','#ffffff'
+];
+const HEART_COLORS = [
+  '#ff4d8d','#ff7eb3','#ffa8d0','#c084fc','#ffb3d9','#ff6b9d','#ff3d7f'
+];
+
+let W = 0, H = 0, DPR = 1;
+const particles = [];
+const MAX_PARTICLES = 1200;
+let celebrating = false;
+let loopRunning = false;
+let lastTime = 0;
+
+function resizeCanvas() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (arr) => arr[(Math.random() * arr.length) | 0];
+
+function spawnConfetti(x, y, count) {
+  if (particles.length > MAX_PARTICLES) return;
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = rand(120, 640);
+    particles.push({
+      type: 'confetti',
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 190,
+      w: rand(6, 13),
+      h: rand(9, 18),
+      rot: Math.random() * Math.PI * 2,
+      vr: rand(-9, 9),
+      color: pick(CONFETTI_COLORS),
+      gravity: 800,
+      drag: 0.86,
+      life: 0,
+      maxLife: rand(2.6, 4.8),
+      alpha: 1,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: rand(3, 8)
+    });
+  }
+}
+
+function spawnHeartBurst(x, y, count, opts = {}) {
+  if (particles.length > MAX_PARTICLES) return;
+  const power = opts.power || 1;
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = rand(90, 440) * power;
+    particles.push({
+      type: 'heart',
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - rand(30, 150),
+      size: rand(9, 27),
+      rot: rand(-0.6, 0.6),
+      vr: rand(-3, 3),
+      color: pick(HEART_COLORS),
+      gravity: rand(120, 330),
+      drag: 0.93,
+      life: 0,
+      maxLife: rand(1.8, 3.4),
+      alpha: 1,
+      glow: true
+    });
+  }
+}
+
+function spawnRisingHeart() {
+  if (particles.length > MAX_PARTICLES) return;
+  particles.push({
+    type: 'heart',
+    x: rand(10, W - 10),
+    y: H + 40,
+    vx: rand(-40, 40),
+    vy: rand(-190, -90),
+    size: rand(10, 26),
+    rot: rand(-0.5, 0.5),
+    vr: rand(-1.6, 1.6),
+    color: pick(HEART_COLORS),
+    gravity: -22,
+    drag: 0.995,
+    life: 0,
+    maxLife: rand(4, 7.5),
+    alpha: 0,
+    fadeIn: 0.8,
+    glow: true
+  });
+}
+
+function drawHeartShape(c, x, y, size, rot, alpha) {
+  const s = size / 16;
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.translate(0, -7 * s);
+  c.globalAlpha = alpha;
+
+  c.beginPath();
+  c.moveTo(0, 3 * s);
+  c.bezierCurveTo(0, 0, -4 * s, -2 * s, -7 * s, -2 * s);
+  c.bezierCurveTo(-12 * s, -2 * s, -12 * s, 3 * s, -12 * s, 3 * s);
+  c.bezierCurveTo(-12 * s, 7 * s, -8 * s, 11 * s, 0, 16 * s);
+  c.bezierCurveTo(8 * s, 11 * s, 12 * s, 7 * s, 12 * s, 3 * s);
+  c.bezierCurveTo(12 * s, 3 * s, 12 * s, -2 * s, 7 * s, -2 * s);
+  c.bezierCurveTo(4 * s, -2 * s, 0, 0, 0, 3 * s);
+  c.closePath();
+  c.fill();
+  c.restore();
+}
+
+function roundRect(c, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  c.beginPath();
+  c.moveTo(x + rr, y);
+  c.arcTo(x + w, y,     x + w, y + h, rr);
+  c.arcTo(x + w, y + h, x,     y + h, rr);
+  c.arcTo(x,     y + h, x,     y,     rr);
+  c.arcTo(x,     y,     x + w, y,     rr);
+  c.closePath();
+}
+
+function tick(now) {
+  const dt = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  ctx.clearRect(0, 0, W, H);
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life += dt;
+
+    const t = p.life / p.maxLife;
+    if (t >= 1) { particles.splice(i, 1); continue; }
+
+    const dragFactor = Math.pow(p.drag, dt * 60);
+    p.vx *= dragFactor;
+    p.vy *= dragFactor;
+    p.vy += p.gravity * dt;
+    p.x  += p.vx * dt;
+    p.y  += p.vy * dt;
+    p.rot += p.vr * dt;
+
+    let a;
+    if (t < 0.08)      a = t / 0.08;
+    else if (t > 0.72) a = (1 - t) / 0.28;
+    else               a = 1;
+    if (p.fadeIn) a = Math.min(a, t / p.fadeIn);
+    p.alpha = Math.max(0, Math.min(1, a));
+
+    if (p.x < -140 || p.x > W + 140 || p.y < -180 || p.y > H + 180) {
+      particles.splice(i, 1);
+      continue;
+    }
+
+    if (p.type === 'confetti') {
+      p.wobble += p.wobbleSpeed * dt;
+      const swayX  = Math.cos(p.wobble) * 0.6;
+      const scaleY = Math.abs(Math.cos(p.wobble * 0.9));
+
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x + swayX, p.y);
+      ctx.rotate(p.rot);
+      ctx.scale(1, Math.max(0.12, scaleY));
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(255,120,180,.35)';
+      roundRect(ctx, -p.w / 2, -p.h / 2, p.w, p.h, 2.5);
+      ctx.fill();
+      ctx.restore();
+
+    } else {
+      ctx.save();
+      ctx.shadowBlur  = p.glow ? 22 : 0;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle   = p.color;
+      drawHeartShape(ctx, p.x, p.y, p.size, p.rot, p.alpha);
+      ctx.restore();
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+function startLoop() {
+  if (loopRunning) return;
+  loopRunning = true;
+  lastTime = performance.now();
+  requestAnimationFrame(tick);
+}
+
+function startCelebration() {
+  if (celebrating) return;
+  celebrating = true;
+  startLoop();
+
+  spawnConfetti(W * 0.50, H * 0.80, 120);
+  spawnConfetti(W * 0.10, H * 0.90, 75);
+  spawnConfetti(W * 0.90, H * 0.90, 75);
+  spawnHeartBurst(W * 0.50, H * 0.42, 32, { power: 1.3 });
+
+  const burstTimer = setInterval(() => {
+    spawnHeartBurst(rand(W * 0.12, W * 0.88), rand(H * 0.16, H * 0.62),
+                    Math.round(rand(14, 26)));
+    if (Math.random() < 0.55) {
+      spawnConfetti(rand(W * 0.15, W * 0.85), H * 0.96, 26);
+    }
+  }, 430);
+  setTimeout(() => clearInterval(burstTimer), 7400);
+
+  setInterval(() => {
+    spawnRisingHeart();
+    if (Math.random() < 0.35) spawnRisingHeart();
+  }, 280);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   4. ПОДГОТОВКА ФОТО
+   ══════════════════════════════════════════════════════════════════════ */
+
+/** Запасная открытка, если своё фото не задано. */
+function generateFallbackCard() {
+  const SIZE = 1080;
+  const c = document.createElement('canvas');
+  c.width = c.height = SIZE;
+  const g = c.getContext('2d');
+
+  const grad = g.createLinearGradient(0, 0, SIZE, SIZE);
+  grad.addColorStop(0,   '#fff1f8');
+  grad.addColorStop(0.45,'#ffe0ef');
+  grad.addColorStop(1,   '#ece0ff');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, SIZE, SIZE);
+
+  const palette = ['#ff9ec7','#ffb3d9','#d7b8ff','#c084fc','#ffc9e0'];
+  for (let i = 0; i < 60; i++) {
+    const size = rand(28, 110);
+    const x    = rand(0, SIZE);
+    const y    = rand(0, SIZE);
+    g.save();
+    g.globalAlpha = rand(0.10, 0.30);
+    g.fillStyle   = pick(palette);
+    drawHeartShape(g, x, y, size, rand(-0.5, 0.5), 1);
+    g.restore();
+  }
+
+  g.save();
+  g.shadowBlur  = 60;
+  g.shadowColor = 'rgba(255,79,139,.55)';
+  const bigGrad = g.createLinearGradient(400, 260, 680, 620);
+  bigGrad.addColorStop(0, '#ff8fbd');
+  bigGrad.addColorStop(0.5, '#ff4f8b');
+  bigGrad.addColorStop(1, '#c86dd7');
+  g.fillStyle = bigGrad;
+  drawHeartShape(g, SIZE / 2, 430, 240, 0, 1);
+  g.restore();
+
+  g.textAlign = 'center';
+  g.fillStyle = '#7a3566';
+  g.font      = 'bold 66px Comfortaa, "Quicksand", sans-serif';
+  g.fillText('Я тебя люблю', SIZE / 2, 830);
+
+  g.fillStyle = '#b56a9b';
+  g.font      = '600 34px Quicksand, sans-serif';
+  g.fillText('❤️  навсегда  ❤️', SIZE / 2, 900);
+
+  const today = new Date().toLocaleDateString('ru-RU');
+  g.fillStyle = 'rgba(150,100,140,.55)';
+  g.font      = '600 24px Quicksand, sans-serif';
+  g.fillText(today, SIZE / 2, 975);
+
+  return c.toDataURL('image/jpeg', 0.92);
+}
+
+/** Возвращает { src, filename } — что показать и что скачать. */
+async function preparePhoto() {
+  const { base64, path, filename } = LOVE_IMAGE;
+
+  if (base64 && base64.trim().length > 40) {
+    return { src: base64.trim(), filename };
+  }
+
+  if (path && path.trim()) {
+    const cleanPath = path.trim();
+    try {
+      const res = await fetch(cleanPath, { cache: 'no-store' });
+      if (res.ok) {
+        const blob = await res.blob();
+        return { src: URL.createObjectURL(blob), filename, revoke: true };
+      }
+    } catch (err) { /* file:// — используем путь напрямую */ }
+    return { src: cleanPath, filename };
+  }
+
+  return { src: generateFallbackCard(), filename: filename || 'my_love.jpg' };
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   5. СКАЧИВАНИЕ — ГЛАВНОЕ ИСПРАВЛЕНИЕ
+   ──────────────────────────────────────────────────────────────────────
+   Раньше браузер мог ОТКРЫТЬ картинку вместо скачивания, потому что:
+     • при file:// атрибут download иногда игнорируется;
+     • blob: URL тоже может открываться во вкладке.
+
+   Решение: ПРЕВРАЩАЕМ картинку в Blob через fetch() и создаём
+   свежую blob:-ссылку. Для неё download работает ВСЕГДА.
+   ══════════════════════════════════════════════════════════════════════ */
+async function downloadCurrentPhoto() {
+  if (!currentPhoto || !currentPhoto.src) return;
+
+  const fname = currentPhoto.filename || 'my_love.jpg';
+
+  try {
+    // 1. Получаем картинку как Blob (работает и для data:, и для blob:, и для http)
+    const response = await fetch(currentPhoto.src, { cache: 'no-store' });
+    if (!response.ok) throw new Error('fetch failed');
+    const blob = await response.blob();
+
+    // 2. Создаём «чистую» blob-ссылку — для неё download гарантирован
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fname;           // ← браузер обязан скачать
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+
+    // 3. Чистим за собой
+    setTimeout(() => {
+      a.remove();
+      URL.revokeObjectURL(url);
+    }, 800);
+
+    showToast('Фото сохранено! 💖');
+    return true;
+
+  } catch (err) {
+    /* Резервный вариант — прямая ссылка (сработает, если fetch заблокирован) */
+    try {
+      const a = document.createElement('a');
+      a.href = currentPhoto.src;
+      a.download = fname;
+      a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 800);
+      showToast('Фото сохранено! 💖');
+      return true;
+    } catch (e) {
+      showToast('Не удалось скачать 😢');
+      return false;
+    }
+  }
+}
+
+let toastTimer = null;
+function showToast(text) {
+  toast.querySelector('.t-text').textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   6. «ДА» → САЛЮТ + ПОКАЗ ФОТО
+   ══════════════════════════════════════════════════════════════════════ */
+async function onYes() {
+  if (accepted) return;
+  accepted = true;
+
+  noBtn.classList.add('gone');
+  setTimeout(() => { if (noFlying) noBtn.remove(); }, 420);
+  document.querySelectorAll('.taunt').forEach(el => el.remove());
+
+  const photoPromise = preparePhoto();
+
+  questionCard.classList.add('fade-out');
+
+  setTimeout(async () => {
+    questionCard.hidden = true;
+    successCard.hidden  = false;
+
+    requestAnimationFrame(() => {
+      successCard.style.animation = 'cardIn .85s cubic-bezier(.2,.85,.25,1) both';
+      startCelebration();
+    });
+
+    try {
+      currentPhoto = await photoPromise;
+      lovePhoto.src = currentPhoto.src;
+    } catch (err) {
+      currentPhoto = {
+        src: generateFallbackCard(),
+        filename: LOVE_IMAGE.filename || 'my_love.jpg'
+      };
+      lovePhoto.src = currentPhoto.src;
+    }
+  }, 460);
+}
+
+yesBtn.addEventListener('click', onYes);
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   7. КНОПКА «СКАЧАТЬ ФОТО»
+   ══════════════════════════════════════════════════════════════════════ */
+downloadBtn.addEventListener('click', async () => {
+  if (!currentPhoto) return;
+
+  // Блокируем кнопку на время, чтобы не было двойных кликов
+  downloadBtn.disabled = true;
+  const originalHTML = downloadBtn.innerHTML;
+  downloadBtn.innerHTML = '<span class="dl-icon">⏳</span><span>Сохраняю…</span>';
+
+  await downloadCurrentPhoto();
+
+  // Возвращаем кнопку в исходное состояние
+  downloadBtn.disabled = false;
+  downloadBtn.innerHTML = originalHTML;
+});
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   8. МЕЛОЧИ
+   ══════════════════════════════════════════════════════════════════════ */
+document.addEventListener('touchmove', (e) => {
+  if (e.target === noBtn) e.preventDefault();
+}, { passive: false });
+
+noBtn.addEventListener('mouseup', (e) => e.preventDefault());
+
+})();
+</script>
+</body>
+</html>
